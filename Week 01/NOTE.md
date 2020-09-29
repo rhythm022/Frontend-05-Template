@@ -69,3 +69,26 @@ board.innerHTML = ""
                 return true
         }
 ```
+
+
+
+### 5.html
+
+使用序列化反序列化的方式clone：
+```
+function clone(pattern){
+    return JSON.parse(JSON.stringify(pattern))
+}
+
+```
+
+
+
+### 7.html
+pattern二维数组和普通数组是等价的
+```
+pattern[j*3 + i]等价于pattern[j][i]
+pattern[i*3 + j]等价于pattern[i][j]
+pattern[i*3 + 2 - j]等价于pattern[i][2-j]
+
+```

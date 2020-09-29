@@ -19,7 +19,7 @@
 
 </html>
 <script>
-/* 增加事件/胜利判断 */
+    /* 增加事件/胜利判断/AI */
     let pattern = [
         [0, 0, 0],
         [0, 0, 0],
@@ -39,25 +39,30 @@
                 cell.classList.add('cell');
                 cell.innerText = pattern[i][j] == 2 ? '❌' :
                     pattern[i][j] === 1 ? '⭕' : '';
-                cell.addEventListener('click',()=>move(j,i))// new add 03.html
+                cell.addEventListener('click', () => move(j, i))// new add 03.html
                 board.appendChild(cell)
             }
             board.appendChild(document.createElement('br'))
         }
     }
 
-    //new add 03.html
-    function move(x,y){
+
+    function move(x, y) {//new add 03.html
         pattern[y][x] = color
-        if(check()){// new add 
+        if (check(pattern, color)) {// new add 04.html
             alert(color == 2 ? 'X is winner !' : 'O is winner !')
         }
         color = 3 - color
 
         show()
+
+        if (willwin(pattern, color)) {
+            console.log(color == 2 ? 'X will win' : 'O will win')
+        }
     }
 
-    function check(){
+
+    function check(pattern, color) {// new add 04.html
         for (let i = 0; i < 3; i++) {
             let win = true
             for (let j = 0; j < 3; j++) {
@@ -65,9 +70,9 @@
                     win = false
                 }
             }
-            if(win) 
+            if (win)
                 return true
-            
+
         }
 
 
@@ -78,28 +83,28 @@
                     win = false
                 }
             }
-            if(win) 
+            if (win)
                 return true
-            
+
         }
         {
-            let win =true
+            let win = true
             for (let j = 0; j < 3; j++) {
                 if (pattern[j][j] !== color) {
-                    win =false
-                }                
+                    win = false
+                }
             }
-            if(win) 
+            if (win)
                 return true
         }
         {
-            let win =true
+            let win = true
             for (let j = 0; j < 3; j++) {
                 if (pattern[j][2 - j] !== color) {
-                    win =false
-                }                
+                    win = false
+                }
             }
-            if(win) 
+            if (win)
                 return true
         }
 
@@ -107,8 +112,25 @@
     }
 
 
+    function clone(pattern) {// new add
+        return JSON.parse(JSON.stringify(pattern))
+    }
 
-
+    function willwin(pattern, color) {// new add
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                if(pattern[i][j])
+                    continue
+                    
+                let tmp = clone(pattern)
+                tmp[i][j] = color
+                if(check(tmp,color)){
+                    return true
+                }
+            }
+        }
+        return false
+    }
 
 
 

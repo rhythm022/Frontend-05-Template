@@ -1,0 +1,177 @@
+<style>
+    .cell {
+        width: 100px;
+        height: 100px;
+        background-color: green;
+        border: solid 1px white;
+        line-height: 100px;
+        font-size: 50px;
+        text-align: center;
+
+
+        display: inline-block;
+        vertical-align: middle;
+
+    }
+</style>
+<html>
+<div id="board"></div>
+
+</html>
+<script>
+    /* 增加事件/胜利判断/AI */
+    let pattern = [
+        [0, 0, 2],
+        [0, 1, 0],
+        [0, 0, 0]
+    ]
+    show()
+    let color = 1
+console.log(
+    bestChoice(pattern,color)
+
+)
+    function show() {
+        let board = document.getElementById('board');
+
+        board.innerHTML = "" // new add 03.html
+
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+
+                let cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.innerText = pattern[i][j] == 2 ? '❌' :
+                    pattern[i][j] === 1 ? '⭕' : '';
+                cell.addEventListener('click', () => move(j, i))// new add 03.html
+                board.appendChild(cell)
+            }
+            board.appendChild(document.createElement('br'))
+        }
+    }
+
+
+    function move(x, y) {//new add 03.html
+        pattern[y][x] = color
+        if (check(pattern, color)) {// new add 04.html
+            alert(color == 2 ? 'X is winner !' : 'O is winner !')
+        }
+        color = 3 - color
+
+        show()
+
+        if (willwin(pattern, color)) {
+            console.log(color == 2 ? 'X will win' : 'O will win')
+        }
+    }
+
+
+    function check(pattern, color) {// new add 04.html
+        for (let i = 0; i < 3; i++) {
+            let win = true
+            for (let j = 0; j < 3; j++) {
+                if (pattern[i][j] !== color) {
+                    win = false
+                }
+            }
+            if (win)
+                return true
+
+        }
+
+
+        for (let i = 0; i < 3; i++) {
+            let win = true
+            for (let j = 0; j < 3; j++) {
+                if (pattern[j][i] !== color) {
+                    win = false
+                }
+            }
+            if (win)
+                return true
+
+        }
+        {
+            let win = true
+            for (let j = 0; j < 3; j++) {
+                if (pattern[j][j] !== color) {
+                    win = false
+                }
+            }
+            if (win)
+                return true
+        }
+        {
+            let win = true
+            for (let j = 0; j < 3; j++) {
+                if (pattern[j][2 - j] !== color) {
+                    win = false
+                }
+            }
+            if (win)
+                return true
+        }
+
+        return false
+    }
+
+
+    function clone(pattern) {// new add
+        return JSON.parse(JSON.stringify(pattern))
+    }
+
+    function willwin(pattern, color) {// new add
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                if(pattern[i][j])
+                    continue
+                    
+                let tmp = clone(pattern)
+                tmp[i][j] = color
+                if(check(tmp,color)){
+                    return [j,i]// modify
+                }
+            }
+        }
+        return null;// modify
+    }
+
+    function bestChoice(pattern,color){
+        let p
+        // 第一层策略：要赢
+        if(p = willwin(pattern,color)){
+            return {
+                point:p,
+                result:1
+            }
+        }
+        //第二层策略：别输
+        let result = -2
+        let point = null
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+               if(pattern[i][j])
+                    continue
+                let tmp = clone(pattern)
+                tmp[i][j] = color;
+                let r = -(bestChoice(tmp,3-color).result)// 负号的含义是对方的-1是我们的1
+
+                if(r > result){// 找到r最大的情况
+                    result = r 
+                    point = [j,i]
+                }
+            }
+        }
+
+        return {
+            point,
+            result: point ? result : 0
+        }
+    }
+
+
+
+
+
+
+</script>
