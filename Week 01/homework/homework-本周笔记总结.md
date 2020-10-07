@@ -102,3 +102,78 @@ pattern[i*3 + 2 - j]等价于pattern[i][2-j]
         return Object.create(pattern)
     }
 ```
+
+### redgreen.html
+假设Promise某异步行为并装配一连串then行为中，没有任一then行为return new Promise，then()则顺序执行下去，否则，如果中间有一then行为return new Promise的，则接下来then行为以这个新的Promise为Promise，这称之为Promise链式调用机制。
+
+
+async关键字的意义仅仅是配合await关键字，并且async函数隐式返回Promise.resolve()，这两点是async函数有别于同步函数的特征：
+```javascript
+  async function returnPromiseResolve() {
+    console.log('A1');
+  }
+  function returnUndefined() {
+    console.log('A1');
+  }
+
+  async function returnPromiseImmediate2() {
+    await sleep(1000);
+  }
+
+  async function returnPromiseImmediate3() {
+    sleep(1000);
+  }
+```
+
+
+
+await调用可以调用任何函数，同步的/异步的/返回Promise的/返回null的，await调用会等待到这些函数return，这没什么特别的，特别的在于，如果这些函数返回Promise，await调用还要等待Promise的结果后再继续执行：
+
+```javascript
+  function returnForeverPending() {
+    return new Promise(resolve => {
+      console.log('A1');
+    });
+  }
+  async function ASNYC__returnForeverPending() { // 等价returnForeverPending函数，只返回时return Promise的函数加不加async关键字没有任何区别
+    return new Promise(resolve => {
+      console.log('A1');
+    });
+  }
+
+
+
+  function normalCall() {
+    returnForeverPending().then(() => {
+      console.log('A2');
+    });
+  }
+
+  async function asyncCall() {
+    await returnForeverPending();
+    console.log('A2');
+  }
+```
+
+```javascript
+  function happen(){
+    return new Promise(resolve => {
+      let listener = document.getElementsByTagName('button')[0]
+      listener.addEventListener('click',resolve,{once:true})
+    })
+  }
+  async function go() {
+    while (true) {
+      green();
+      await happen();
+
+      yellow();
+      await happen();
+
+      red();
+      await happen();
+
+    }
+
+  }
+```

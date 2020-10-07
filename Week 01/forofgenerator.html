@@ -1,0 +1,29 @@
+<script>
+  function sleep(t) {
+    return new Promise(resolve => {
+      setTimeout(resolve, t);
+    });
+  }
+
+  async function* counter() {
+    let i = 0;
+    while(true){
+      await sleep(1000)
+      yield i++
+    }
+  }
+
+
+  async function go() {
+    for await (const v of counter()) {
+      console.log(v)
+    }
+  }
+
+
+
+
+
+
+
+</script>

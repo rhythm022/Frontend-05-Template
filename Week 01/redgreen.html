@@ -1,0 +1,181 @@
+<style>
+    div {
+        background-color: grey;
+        display: inline-block;
+        margin: 30px;
+        width: 100px;
+        height: 100px;
+        border-radius: 50px;
+    }
+
+    .green.light {
+        background-color: green
+    }
+
+    .yellow.light {
+        background-color: yellow
+    }
+
+    .red.light {
+        background-color: red
+    }
+</style>
+<html>
+<div class="green"></div>
+<div class="yellow"></div>
+<div class="red"></div>
+<button>click</button>
+</html>
+<script>
+  function green() {
+    let lights = document.getElementsByTagName('div');
+
+    for (let i = 0; i < 3; i++) {
+      lights[i].classList.remove('light');
+      document.getElementsByClassName('green')[0].classList.add('light');
+    }
+  }
+
+  function red() {
+    let lights = document.getElementsByTagName('div');
+
+    for (let i = 0; i < 3; i++) {
+      lights[i].classList.remove('light');
+      document.getElementsByClassName('red')[0].classList.add('light');
+    }
+  }
+
+  function yellow() {
+    let lights = document.getElementsByTagName('div');
+
+    for (let i = 0; i < 3; i++) {
+      lights[i].classList.remove('light');
+      document.getElementsByClassName('yellow')[0].classList.add('light');
+    }
+  }
+
+  // function go1() {
+  //   green()
+  //   setTimeout(()=>{
+  //     yellow()
+  //     setTimeout(()=>{
+  //       red()
+  //       setTimeout(()=>{
+  //         go()
+  //       },1000)
+  //     },2000)
+  //   },3000)
+  // }
+
+  function sleep(t) {
+    return new Promise(resolve => {
+      setTimeout(resolve, t);
+    });
+  }
+
+  // function go2() {
+  //   green();
+  //   sleep(3000).then(() => {
+  //     yellow();
+  //     return sleep(2000);
+  //   }).then(() => {
+  //     red();
+  //     return sleep(1000);
+  //   }).then(go);
+  //
+  // }
+
+  // async function go() {
+  //   while (true) {
+  //     green();
+  //     await sleep(300);
+  //
+  //     yellow();
+  //     await sleep(200);
+  //
+  //     red();
+  //     await sleep(100);
+  //
+  //   }
+  //
+  // }
+
+  function happen(){
+    return new Promise(resolve => {
+      let listener = document.getElementsByTagName('button')[0]
+      listener.addEventListener('click',resolve,{once:true})
+    })
+  }
+  async function go() {
+    while (true) {
+      green();
+      await happen();
+
+      yellow();
+      await happen();
+
+      red();
+      await happen();
+
+    }
+
+  }
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
