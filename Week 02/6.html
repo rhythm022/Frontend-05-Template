@@ -28,7 +28,7 @@
 
 <script>
   let map = localStorage['map'] ? JSON.parse(localStorage['map']) : Array(10000).fill(0);
-
+let path = []
   let container = document.getElementById('container');
 
   for (let y = 0; y < 100; y++) {
@@ -71,37 +71,85 @@
       setTimeout(resolve, t);
     });
   }
-  async function findPath(map, start, end) {
-    var queue = [start]
 
-    async function insert(x, y, pre) {
-      if (x < 0 || x >= 100 || y < 0 || y >= 100) return
-      if (map[y * 100 + x]) return // 1 or [] return
-
-      // await sleep(1)
-      container.children[y * 100 + x].style.backgroundColor = 'lightgreen'
-
-      map[y * 100 + x] = pre
-      // console.log(pre)
-      queue.push([x, y])
+  class Sorted {
+    constructor(data, compare) {
+      this.data = data.slice();
+      this.compare = compare || ((a, b) => a - b)
     }
 
-    while (queue.length) {
-      let [x, y] = queue.shift();
+    take() {
+      if (!this.data.length) return
+      let min = this.data[0]
+      let minIndex = 0
+
+      for (let i = 1; i < this.data.length; i++) {
+        if (this.compare(this.data[i], min) < 0) {
+          min = this.data[i]
+          minIndex = i
+        }
+      }
+
+      this.data[minIndex] = this.data[this.data.length - 1]
+      this.data.pop()
+
+      return min
+    }
+
+    push(v) {
+      this.data.push(v)
+    }
+  }
+  async function findPath(map, start, end) {
+    var queue = new Sorted([start], (a, b) => distance(a, end) - distance(b, end))
+
+    function distance(point, ref) {
+      return (point[0] - ref[0]) ** 2 + (point[1] - ref[1]) ** 2
+    }
+    async function insert(x, y, pre) {
+      if (x < 0 || x >= 100 || y < 0 || y >= 100) return
+      if (map[y * 100 + x] === 1) {
+        return
+
+      } else if (map[y * 100 + x] === 0) {
+        // await sleep(1)
+        container.children[y * 100 + x].style.backgroundColor = 'lightgreen'
+
+        map[y * 100 + x] = pre
+        // console.log(pre)
+        queue.push([x, y])
+      }
+       else {// pre
+        if (
+          distance(pre, start) <= distance(map[y * 100 + x], start) &&
+          distance(pre, end) >= distance(map[y * 100 + x], end) 
+          ){
+          console.log(pre,map[y * 100 + x])
+      
+          map[y * 100 + x] = pre
+
+        }
+
+      }
+
+    }
+
+    while (queue.data.length) {
+      let [x, y] = queue.take();
       if (x === end[0] && y === end[1]) { // new add
-        let path = []
+        // let path = []
 
         while (x != start[0] || y != start[1]) {
           [x, y] = map[y * 100 + x]
 
-          path.push([x,y])
+          path.push([x, y])
 
 
 
           container.children[y * 100 + x].style.backgroundColor = 'purple'
-          console.log(x, y)
+          // console.log(x, y)
 
-          await sleep(30)
+          await sleep(1)
 
         }
         return path
@@ -118,6 +166,6 @@
       await insert(x - 1, y + 1, [x, y])// new add 斜向
     }
 
-    return null 
+    return null
   }
 </script>
