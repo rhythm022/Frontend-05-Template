@@ -1,0 +1,75 @@
+<html>
+
+</html>
+
+
+<script>
+    //捕获0/1/2/3/4/5/6/7/8/9/.
+    var regexp = /([0-9.]+)|([ \t]+)|([\r\n]+)|(\*)|(\/)|(\+)|(\-)/g
+
+    var tokenType = ['Number','Whitespace','LineTerminator','*','/','+','-']
+
+    function tokenize(source) {
+      var regFound = null
+
+      while (true){
+        regFound = regexp.exec(source)
+
+        if(!regFound) break
+
+        console.log(regFound)
+
+        for (var i = 1; i < tokenType.length; i++) {
+          if(regFound[i])
+            console.log(tokenType[i - 1])
+        }
+      }
+    }
+
+    tokenize('1024 + 10 * 25')
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
