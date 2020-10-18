@@ -1,0 +1,218 @@
+<html lang="en">
+
+<head>
+    <style>
+        .cell {
+            display: inline-block;
+            vertical-align: middle;
+            line-height: 7px;
+            width: 6px;
+            height: 6px;
+            background-color: gray;
+            border-bottom: 1px solid white;
+            border-right: 1px solid white;
+        }
+
+        #container {
+            width: 701px;
+        }
+    </style>
+</head>
+
+<body>
+<div id="container"></div>
+<button onclick="localStorage['map'] = JSON.stringify(map)">save</button>
+</body>
+
+</html>
+
+<script>
+  let map = localStorage['map'] ? JSON.parse(localStorage['map']) : Array(10000).fill(0);
+  let path = []
+  let container = document.getElementById('container');
+
+  for (let y = 0; y < 100; y++) {
+    for (let x = 0; x < 100; x++) {
+      let cell = document.createElement('div');
+      cell.classList.add('cell');
+
+      if (map[100 * y + x] == 1)
+        cell.style.backgroundColor = 'black';
+
+      cell.addEventListener('mousemove', () => {
+        if (mousedown) {
+          if (clear) {
+            cell.style.backgroundColor = '';
+            map[100 * y + x] = 0;
+          } else {
+            cell.style.backgroundColor = 'black';
+            map[100 * y + x] = 1;
+          }
+        }
+      });
+
+      container.appendChild(cell);
+
+    }
+  }
+
+  let mousedown = false;
+  let clear = false;
+
+  document.addEventListener('mousedown', e => {
+    mousedown = true;
+    clear = (e.which === 3);
+  });
+  document.addEventListener('mouseup', () => mousedown = false);
+  document.addEventListener('contextmenu', e => e.preventDefault());
+
+  function sleep(t) {
+    return new Promise(resolve => {
+      setTimeout(resolve, t);
+    });
+  }
+
+  class Sorted {
+    constructor(data, compare) {
+      this.data = data.slice();
+      this.compare = compare || ((a, b) => a - b)
+    }
+
+    take() {
+      if (!this.data.length) return
+      let min = this.data[0]
+      let minIndex = 0
+
+      for (let i = 1; i < this.data.length; i++) {
+        if (this.compare(this.data[i], min) < 0) {
+          min = this.data[i]
+          minIndex = i
+        }
+      }
+
+      this.data[minIndex] = this.data[this.data.length - 1]
+      this.data.pop()
+
+      return min
+    }
+
+    push(v) {
+      this.data.push(v)
+    }
+  }
+
+  class BinaryHeap{
+    constructor(data,compare) {
+      this.data = data
+      this.compare = compare
+    }
+
+    take(){
+      if(!this.data.length) return
+
+      let min = this.data[0];
+      let i = 0//指针i指向堆首
+
+      //上移后续节点
+      while(i < this.data.length){//遍历
+        if(i * 2 + 1 >= this.data.length)//没有孩子
+          break;//退出
+        if(i * 2 + 2 >= this.data.length){//有左孩，右孩为空
+          this.data[i] = this.data[i * 2 + 1] //把左孩赋值为父节点（左孩上移）
+          i = i * 2 + 1//指针移到左孩
+          break; //退出
+        }
+        if(this.compare(this.data[i * 2 + 1],this.data[i * 2 + 2])<0){//左孩右孩都有，左孩小
+          this.data[i] = this.data[i * 2 + 1]//把左孩赋值为父节点（左孩上移）
+          i = i * 2 + 1//指针移到左孩
+        }else{
+          this.data[i] = this.data[i * 2 + 2]
+          i = i * 2 + 2
+        }
+      }
+
+      if(i< this.data.length - 1){
+        this.insertAt(i,this.data.pop())//☆☆☆
+      }else{
+        this.data.pop()
+      }
+
+      return min
+    }
+
+    insertAt(i,v){
+      this.data[i] = v//v是新插入节点，把新节点push到数组最后，指针i指向插入节点
+      while(i>0 && this.compare(v,this.data[Math.floor((i-1)/2)]) < 0){//插入节点值比其父节点值小
+        this.data[i] = this.data[Math.floor((i-1)/2)]// 父节点赋值给孩子节点（父节点下沉）
+        this.data[Math.floor((i-1)/2)] = v //插入节点赋值给父节点（插入点上移）
+        i = Math.floor((i-1)/2)//（下个遍历节点：父节点）
+      }
+    }
+
+    push(v){
+      this.insertAt(this.data.length,v)
+    }
+
+    get length(){
+      return this.data.length
+    }
+  }
+  async function findPath(map, start, end) {
+    const _map = Object.create(map)
+    var queue = new BinaryHeap([start], (a, b) => distance(a, end) - distance(b, end))
+
+    function distance(point, ref) {
+      return (point[0] - ref[0]) ** 2 + (point[1] - ref[1]) ** 2
+    }
+    async function insert(x, y, pre) {
+      if (x < 0 || x >= 100 || y < 0 || y >= 100) return
+      if (_map[y * 100 + x] === 1) {
+        return
+
+      } else if (_map[y * 100 + x] === 0) {
+        // await sleep(1)
+        container.children[y * 100 + x].style.backgroundColor = 'lightgreen'
+
+        _map[y * 100 + x] = pre
+        // console.log(pre)
+        queue.push([x, y])
+      }
+
+
+    }
+
+    while (queue.length) {
+      let [x, y] = queue.take();
+      if (x === end[0] && y === end[1]) { // new add
+        // let path = []
+
+        while (x != start[0] || y != start[1]) {
+          [x, y] = _map[y * 100 + x]
+
+          path.push([x, y])
+
+
+
+          container.children[y * 100 + x].style.backgroundColor = 'purple'
+          console.log(x, y,'purple')
+
+          await sleep(1)
+
+        }
+        return path
+      }
+
+      await insert(x - 1, y, [x, y])
+      await insert(x, y - 1, [x, y])
+      await insert(x + 1, y, [x, y])
+      await insert(x, y + 1, [x, y])
+
+      await insert(x - 1, y - 1, [x, y])// new add 斜向
+      await insert(x + 1, y - 1, [x, y])// new add 斜向
+      await insert(x + 1, y + 1, [x, y])// new add 斜向
+      await insert(x - 1, y + 1, [x, y])// new add 斜向
+    }
+
+    return null
+  }
+</script>
