@@ -1,0 +1,92 @@
+<html>
+
+</html>
+
+
+<script>
+  //捕获0/1/2/3/4/5/6/7/8/9/.
+  var regexp = /([0-9.]+)|([ \t]+)|([\r\n]+)|(\*)|(\/)|(\+)|(\-)/g;
+
+  var tokenType = ['Number', 'Whitespace', 'LineTerminator', '*', '/', '+', '-'];
+
+  function* tokenize(source) {
+    var regFound = null;
+    var lastIndex = 0;
+    while (true) {
+      lastIndex = regexp.lastIndex;
+      regFound = regexp.exec(source);
+
+      if (!regFound) break
+
+      if (regexp.lastIndex - lastIndex > regFound[0].length) {
+        console.log('未知字符',regexp.lastIndex,lastIndex,regFound)
+        break;
+      }
+
+      let token = {
+        type: null,
+        value: null,
+      };
+      for (let i = 1; i < tokenType.length; i++) {
+        if (regFound[i])
+          token.type = tokenType[i - 1];
+      }
+      token.value = regFound[0];
+      yield token;
+    }
+
+    yield {
+      type: 'EOF'
+    }
+  }
+
+  for (let token of tokenize('1024z + 10 * 25')) {
+    console.log(token)
+    ;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

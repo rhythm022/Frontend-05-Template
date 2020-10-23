@@ -1,0 +1,122 @@
+<html>
+
+</html>
+
+
+<script>
+  //捕获0/1/2/3/4/5/6/7/8/9/.
+  var regexp = /([0-9.]+)|([ \t]+)|([\r\n]+)|(\*)|(\/)|(\+)|(\-)/g;
+
+  var tokenType = ['Number', 'Whitespace', 'LineTerminator', '*', '/', '+', '-'];
+
+  function* tokenize(source) {
+    var regFound = null;
+    var lastIndex = 0;
+    while (true) {
+      lastIndex = regexp.lastIndex;
+      regFound = regexp.exec(source);
+
+      if (!regFound) break
+
+      if (regexp.lastIndex - lastIndex > regFound[0].length) {
+        console.log('未知字符',regexp.lastIndex,lastIndex,regFound)
+        break;
+      }
+
+      let token = {
+        type: null,
+        value: null,
+      };
+      for (let i = 1; i < tokenType.length; i++) {
+        if (regFound[i])
+          token.type = tokenType[i - 1];
+      }
+      token.value = regFound[0];
+      yield token;
+    }
+
+    yield {
+      type: 'EOF'
+    }
+  }
+
+  let tokenList = []
+  for (let token of tokenize('1024 / 10 * 25 + 1234')) {
+    if(token.type !== 'Whitespace' && token.type !== 'LineTerminator')
+      tokenList.push(token)
+  }
+
+
+  function MultiplicativeExpression(tokenList) {
+    if(tokenList[0].type === 'Number'){
+      let node = {
+        type:'MultiplicativeExpression',
+        children:[tokenList[0]]
+      }
+      tokenList[0] = node
+      return MultiplicativeExpression(tokenList)
+    }
+
+    if(tokenList[0].type === 'MultiplicativeExpression' && tokenList[1] && (tokenList[1].type === '*' || tokenList[1].type === '/')){
+      let node = {
+        type:'MultiplicativeExpression',
+        operator:tokenList[1].type,
+        children: []
+      }
+      node.children.push(tokenList.shift())
+      node.children.push(tokenList.shift())
+      node.children.push(tokenList.shift())
+      tokenList.unshift(node)
+      return MultiplicativeExpression(tokenList)
+    }
+    //MultiplicativeExpression如果后面不跟乘号除号，说明已经把所有乘法都处理完毕
+    if(tokenList[0].type === 'MultiplicativeExpression')return tokenList[0]
+
+    // return MultiplicativeExpression(tokenList)
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
