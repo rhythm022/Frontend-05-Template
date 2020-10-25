@@ -1,0 +1,261 @@
+<html>
+
+</html>
+
+
+<script>
+  //捕获0/1/2/3/4/5/6/7/8/9/.
+  var regexp = /([0-9.]+)|([ \t]+)|([\r\n]+)|(\*)|(\/)|(\+)|(\-)/g;
+
+  var tokenType = ['Number', 'Whitespace', 'LineTerminator', '*', '/', '+', '-'];
+
+  function* tokenize(source) {
+    var regFound = null;
+    var lastIndex = 0;
+    while (true) {
+      lastIndex = regexp.lastIndex;
+      regFound = regexp.exec(source);
+
+      if (!regFound) break;
+
+      if (regexp.lastIndex - lastIndex > regFound[0].length) {
+        console.log('未知字符', regexp.lastIndex, lastIndex, regFound);
+        break;
+      }
+
+      let token = {
+        type: null,
+        value: null,
+      };
+      for (let i = 1; i < tokenType.length; i++) {
+        if (regFound[i])
+          token.type = tokenType[i - 1];
+      }
+      token.value = regFound[0];
+      yield token;
+    }
+
+    yield {
+      type: 'EOF',
+    };
+  }
+
+  function getNext(tokens) {
+    let next = tokens.next();
+    while (next) {
+      let value = next.value;
+      if (!value) break;
+      if (value.type !== 'Whitespace' && value.type !== 'LineTerminator') return value;
+
+      next = tokens.next();
+
+    }
+  }
+
+  const tokens = tokenize('123 * 12 /144 + 222');
+  console.log(
+      deduceExpression(getNext(tokens), getNext(tokens), tokens),
+  );
+
+  function deduceExpression(current, next, tokens) {
+    if (current.type === 'AdditiveExpression' && next && next.type === 'EOF') {
+      return [
+        {
+          type: 'Expression',
+          children: [current, next],
+        }];
+    }
+
+    const [c,n]= deduceAdditiveExpression(current,next,tokens);
+    return deduceExpression(c,n,tokens);
+  }
+
+  function deduceAdditiveExpression(current, next, tokens) {
+    if (current.type === 'MultiplicativeExpression') {
+      let node = {
+        type: 'AdditiveExpression',
+        children: [current],
+      };
+      return deduceAdditiveExpression(node,next,tokens);
+    }
+
+    if (current.type === 'AdditiveExpression' && next &&
+        (next.type === '+' || next.type === '-')) {
+      const [c,n]= deduceMultiplicativeExpression(getNext(tokens),getNext(tokens),tokens);
+
+      let node = {
+        type: 'AdditiveExpression',
+        operator: next.type,
+        children: [current,next,c],
+      };
+
+
+      return deduceAdditiveExpression(node,n,tokens);
+
+    }
+
+    if (current.type === 'AdditiveExpression') {
+      return [current,next];
+    }
+
+    const [c,n]= deduceMultiplicativeExpression(current,next,tokens);
+
+    return deduceAdditiveExpression(c,n,tokens);
+  }
+
+  function deduceMultiplicativeExpression(current, next, tokens) {
+    if (current.type === 'Number') {
+      let node = {
+        type: 'MultiplicativeExpression',
+        children: [current],
+      };
+      return deduceMultiplicativeExpression(node, next, tokens);
+    }
+
+    if (current.type === 'MultiplicativeExpression' && next &&
+        (next.type === '*' || next.type === '/')) {
+      let node = {
+        type: 'MultiplicativeExpression',
+        operator: next.type,
+        children: [current, next, getNext(tokens)],
+      };
+
+      return deduceMultiplicativeExpression(node, getNext(tokens), tokens);
+    }
+    //MultiplicativeExpression如果后面不跟乘号除号，说明已经把所有乘法都处理完毕
+    if (current.type === 'MultiplicativeExpression') return [current, next];// why
+
+    // return MultiplicativeExpression(tokenList)
+  }
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
