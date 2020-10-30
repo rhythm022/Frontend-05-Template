@@ -15,3 +15,17 @@
     this.data.pop()
 ```
 
+
+###  callback 授人以摸鱼
+初始化变量的最佳实践
+```javascript
+let map =(function() {
+          let saved = localStorage['map']
+          if(saved){
+            return JSON.parse(saved)
+          }
+          else{
+            return Array(10000).fill(0)
+          }
+        })()
+```
