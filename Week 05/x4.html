@@ -1,0 +1,93 @@
+<script>
+  let callbacks = new Map();
+  let reactivities = new Map();
+
+  let usedReactivities = [];
+
+  let sam = {
+    a1: {
+      a2:2
+    },
+    b: 3,
+  };
+
+  let po = reactive(sam);//// 初始化po型变量，把普通变量变成po型变量
+
+  effect(() => {
+    // ★★★ cb相当于vue中的computed函数：钩子函数中的po型变量变化时/被set时，执行钩子函数
+    console.log('boom',po.a1,po.a1.a2);
+  });
+
+  //effect()函数可类比addEventListener()函数
+  function effect(cb) {//effect注册钩子函数的过程就是存储的过程
+    usedReactivities = [];
+    cb();
+
+    for (let reactivity of usedReactivities) {// usedReactivities中收集了钩子中所有po型的的obj.p
+      if (!callbacks.has(reactivity[0])) {
+        callbacks.set(reactivity[0], new Map());
+      }
+      if (!callbacks.get(reactivity[0]).has(reactivity[1])) {
+        callbacks.get(reactivity[0]).set(reactivity[1], []);
+      }
+      //两层key
+      callbacks.get(reactivity[0]).get(reactivity[1]).push(cb);// obj和p他们作为key，为每一个po.p，各自存储钩子
+    }
+
+  }
+
+  // reactive()：把普遍变量变成po型变量，返回po型变量并缓存入reactivities
+  // reactive函数本身是无状态的
+  function reactive(obj) {
+    if (reactivities.has(obj))
+      return reactivities.get(obj);
+
+    let po = new Proxy(obj, {
+      set(obj, p, value) {
+        obj[p] = value;
+
+        if (callbacks.get(obj))
+          if (callbacks.get(obj).get(p))
+            for (let cb of callbacks.get(obj).get(p))
+              cb();//set时触发钩子函数
+
+
+        return obj[p];
+      },
+      get(obj, p) {
+        console.log([obj, p])
+        usedReactivities.push([obj, p]);//只有po型obj才会被收集到
+        if (typeof obj[p] === 'object')
+          return reactive(obj[p]);// ★★★必须return，否则收集不到
+        return obj[p];
+
+      },
+    });
+
+    reactivities.set(obj, po);
+
+    return po;
+  }
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

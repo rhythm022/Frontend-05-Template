@@ -1,0 +1,25 @@
+<script>
+    let sam = {
+      a:1,
+      b:2
+    }
+
+
+    let po = reactive(sam)
+
+    function reactive(object){
+      return new Proxy(object,{
+        set(target, p, value,) {
+          target[p] = value
+          return target[p]
+        },
+        get(target, p,) {
+          return target[p]
+
+        }
+      })
+    }
+    po.c = po.a
+    console.log(sam)
+    console.log(po)
+</script>

@@ -1,0 +1,38 @@
+<script>
+    let callbacks = []
+    let sam = {
+      a:1,
+      b:2
+    }
+
+
+    let po = reactive(sam)
+
+
+    effect(()=>{
+      console.log(po.a)
+    })
+
+    function effect(cb) {//相当于addEventListener
+      callbacks.push(cb)
+    }
+    function reactive(object){
+      return new Proxy(object,{
+        set(target, p, value,) {
+          target[p] = value
+
+          for (let cb of callbacks) {
+            cb()
+          }
+
+          return target[p]
+        },
+        get(target, p,) {
+          return target[p]
+
+        }
+      })
+    }
+    po.c = po.a
+
+</script>

@@ -1,0 +1,123 @@
+<input type="range" id="r" min=0 max=255>
+<input type="range" id="g" min=0 max=255>
+<input type="range" id="b" min=0 max=255>
+<div id="color" style="width: 100px;height: 100px"></div>
+<script>
+  let callbacks = new Map();
+  let reactivities = new Map();
+
+  let usedReactivities = [];
+
+  let sam = {
+    r: 0,
+    g: 0,
+    b: 0,
+  };
+
+  let po = reactive(sam);//// 初始化po型变量，把普通变量变成po型变量
+
+  // ★★★ 光有reactivity是单向绑定
+  effect(() => {
+    console.log('reactivity：po.r改变value（改变value不会触发input事件）');
+    // ★★★ cb相当于vue中的computed函数：钩子函数中的po型变量变化时/被set时，执行钩子函数
+    document.getElementById('r').value = po.r;
+  });
+
+  effect(() => {
+    document.getElementById('g').value = po.g;
+  });
+
+  effect(() => {
+    document.getElementById('b').value = po.b;
+  });
+
+  effect(() => {
+    document.getElementById('color').style.backgroundColor = `rgb(${po.r},${po.g},${po.b})`;
+  });
+
+  document.getElementById('r').addEventListener('input', (e) => {
+    console.log('原生event：value改变po.r很容易');
+    // ★★★ input事件中触发了reactivity
+    po.r = e.target.value;// ★★★ value 代表 DOM
+
+  });
+  document.getElementById('g').addEventListener('input', (e) => {
+    po.g = e.target.value;
+
+  });
+  document.getElementById('b').addEventListener('input', (e) => {
+    po.b = e.target.value;
+
+  });
+
+  //effect()函数可类比addEventListener()函数
+  function effect(cb) {//effect注册钩子函数的过程就是存储的过程
+    usedReactivities = [];
+    cb();
+
+    for (let reactivity of usedReactivities) {// usedReactivities中收集了钩子中所有po型的的obj.p
+      if (!callbacks.has(reactivity[0])) {
+        callbacks.set(reactivity[0], new Map());
+      }
+      if (!callbacks.get(reactivity[0]).has(reactivity[1])) {
+        callbacks.get(reactivity[0]).set(reactivity[1], []);
+      }
+      //两层key
+      callbacks.get(reactivity[0]).get(reactivity[1]).push(cb);// obj和p他们作为key，为每一个po.p，各自存储钩子
+    }
+
+  }
+
+  // reactive()：把普遍变量变成po型变量，返回po型变量并缓存入reactivities
+  // reactive函数本身是无状态的
+  function reactive(obj) {
+    if (reactivities.has(obj))
+      return reactivities.get(obj);
+
+    let po = new Proxy(obj, {
+      set(obj, p, value) {
+        obj[p] = value;
+
+        if (callbacks.get(obj))
+          if (callbacks.get(obj).get(p))
+            for (let cb of callbacks.get(obj).get(p))
+              cb();//set时触发钩子函数
+
+        return obj[p];
+      },
+      get(obj, p) {
+        usedReactivities.push([obj, p]);//只有po型obj才会被收集到
+        if (typeof obj[p] === 'object')
+          return reactive(obj[p]);// ★★★必须return，否则收集不到
+        return obj[p];
+
+      },
+    });
+
+    reactivities.set(obj, po);
+
+    return po;
+  }
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
