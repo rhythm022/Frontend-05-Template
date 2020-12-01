@@ -1,0 +1,86 @@
+<script>
+    function createKMPMatcher(pattern) {
+        let chs = [...pattern]
+        let end = () => end
+
+        let states = [
+            ch => {
+                console.log(ch)
+
+                console.log('状态', 0,'我要', chs[0])
+                console.log('下个状态',1,'or',0)
+
+                return ch == chs[0] ? states[1] : states[0]
+            }
+        ]
+
+        let table = Array(chs.length).fill(0);
+
+        for (let i = 1; i < chs.length; ++i) {
+            states.push(
+                ch => {
+                    console.log(ch)
+
+                    console.log('状态', i,'我要', chs[i])
+
+                    console.log('下个状态',i+1,'or',0)
+                    return ch == chs[i] ? states[i + 1] : states[0](ch)
+                }
+            )
+        }
+
+        states.push(end)
+
+        let i = 1, j = 0
+        while (i < chs.length) {
+            if (chs[i] == chs[j]) {
+                const _i = ++i
+                const _j = ++j
+                if (table[i] != j) {
+                    table[i] = j
+                    states[i] =
+                        ch => {
+                            console.log(ch)
+                            console.log('状态', _i,'我要', chs[_i])
+
+                            console.log('下个状态',_i+1,'or',_j)
+
+                            return ch == chs[_i] ? states[_i + 1] : states[_j](ch)
+                        }
+                }
+            }
+            else if (j > 0) {
+                // j大于零，说明i已经匹配到一些字符了，但i+1没有匹配上j+1
+                // 但是如果j+1之前有匹配上一些字符j'
+                // 所以可以让i+1和j'试试
+                j = table[j]
+            }
+            else {
+                ++i
+            }
+        }
+        table = null
+
+        return [
+            states[0], end
+        ]
+    }
+
+    function match(str, init, succ) {
+        let state = init
+        for (const ch of str) {
+            state = state(ch)
+        }
+        return state === succ
+    }
+
+    function KMP(pattern, str) {
+        let matcher = createKMPMatcher(pattern)
+
+        return match(str, matcher[0], matcher[1])
+    }
+
+    console.log(
+        KMP('ababx', 'abababx')
+    )
+</script>

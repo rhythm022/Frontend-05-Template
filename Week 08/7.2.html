@@ -1,0 +1,25 @@
+<script>
+    const start = ch => ch == 'a' ? foundA1 : start//
+    const foundA1 = ch => ch == 'b' ? foundB1 : start(ch)//a
+    const foundB1 = ch => ch == 'a' ? foundA2 : start(ch)//ab
+    const foundA2 = ch => ch == 'b' ? foundB2 : start(ch)//aba
+    const foundB2 = ch => ch == 'a' ? foundA3 : foundB1(ch)//这个状态时可以确定str满足abab
+    //其中又发现abab的ab满足模式串，所以回到foundB1
+    const foundA3 = ch => ch == 'b' ? foundB3 : foundA2(ch)//这个状态时可以确定str满足ababa
+    //其中又发现ababa的aba满足模式串，所以回到foundA2
+    const foundB3 = ch => ch == 'x' ? end : foundB2(ch)
+    const end = () => end
+
+    function match(str,init = start,succ = end){
+        let state = init
+        for (const ch of str) {
+            state = state(ch)
+        }
+
+        return state === succ
+    }
+
+    console.log(
+        match('ababababx')
+    )
+</script>
