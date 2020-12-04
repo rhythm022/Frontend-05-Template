@@ -8,11 +8,14 @@ http.createServer((request,response)=>{
     console.error(error)
   })
   .on('data',chunk=>{
-    body.push(chunk.toString())//toString()为什么？？chunk原来是什么类型？？
+    console.log(
+        chunk
+    )
+    body.push(chunk.toString())//chunk原来Buffer类型
   })
   .on('end',()=>{
-    body = body.join('')
-    console.log('body:',body)
+    // body = body.join('')
+    // console.log('body:',body)
 
     response.writeHead(200,{'Content-Type':'text/html'})
     response.end(' hello'.repeat(500))
