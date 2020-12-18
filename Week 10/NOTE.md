@@ -33,6 +33,11 @@ parseInt(element.style[prop]);
 
 
 
+justifyContent:行的主方向
+alignContent:行的纵方向
+alignSelf/父alignItems：元素的行内纵方向
+
+
 
 
 

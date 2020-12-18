@@ -12,36 +12,32 @@ http.createServer((request, response) => {
     // console.log('body: ', body);
     response.writeHead(200, { 'Content-Type': 'text/html' });
     // response.end('Hello World!!!');
-    response.end(`<html>
-<head>
-    <meta charset="utf-8" />
-    <style>
-        #root {
-            width: 200px;
-            height: 200px;
-            background-color: yellow;
-        }
-        .father .son {
-            width: 50px;
-            height: 50px;
-            background-color: 'red';
-        }
-        body img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 1px solid #e6e6e6;
-        }
-    </style>
-</head>
-<body>
-    <div id="root" class="root">hello world!!!</div>
-    <div class="father">
-        <div class="son">box</div>
-    </div>
-    <img src='a' alt="a" />
-</body>
-</html>`)
+    response.end(   `<head>
+            <style>
+              #container{
+                width: 500px;
+                height: 300px;
+                display: flex;
+                background-color: rgb(255,255,255);
+              }
+              #container #myid{
+                width: 200px;
+                height: 100px;
+                background-color: rgb(255,0,0);
+              }
+              #container .c1{
+                flex: 1;
+                background-color: rgb(0,255,0);
+              }
+            </style>
+          </head>
+          <body>
+            <div id="container">
+              <div id="myid"></div>
+              <div class="c1"></div>
+            </div>
+          </body>
+          `)
   })
 }).listen(8088);
 

@@ -1,7 +1,7 @@
 const net = require('net');
 const util = require('util');
 const parser = require('./HTMLparser');
-
+const images = require('images')
 // 解析响应数据体
 class ChunkedParser {
   constructor() {
@@ -232,5 +232,25 @@ void async function() {
   const response = await request.send();
   // console.log('response:', response);
   const html = parser.parserHtml(response);
+
+  let viewport = images(800,600)
+
+  render(viewport,html.children[0].children[3].children[1].children[3])
+  viewport.save("./viewport.jpg")
   console.log(util.inspect(html, {depth: null}));
 }();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
