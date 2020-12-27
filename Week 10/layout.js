@@ -320,7 +320,7 @@ function layout(element) {
   //★★★end 確定每个子元素的mainSize、mainStart、mainEnd
 
   //★★★start確定每个子元素的crossSize
-  // - 设计align-items align-self、alignContent
+  // - 涉及align-items align-self、alignContent
   {
     // 预处理：如果之前父元素crossSize是未定的，在这里确定父元素crossSize（为所有行的高的和）
     // 预处理：确定父元素剩余纵向空间/crossSpace
