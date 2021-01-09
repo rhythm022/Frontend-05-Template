@@ -1,4 +1,4 @@
-import {h, Component} from './vue';
+import { h, Component } from './vue';
 
 class Carousel extends Component {
   constructor() {
@@ -31,15 +31,15 @@ class Carousel extends Component {
 
         // ((x- x%500) / 500) = 0或1或2...往右移position是减1,2...
         // 实时得出当前的position偏置，用于判断选中哪个照片做transform
-        const RTPosition = position - ((x- x%500) / 500);
+        const RTPosition = position - ((x - x % 500) / 500);
 
-        for (const offset of [-1,0,1]) {
+        for (const offset of [-1, 0, 1]) {
           let pos = RTPosition + offset
-          pos = (pos%children.length + children.length)%children.length//用position偏置算出照片索引
+          pos = (pos % children.length + children.length) % children.length//用position偏置算出照片索引
           children[pos].style.transition = 'none';
-          children[pos].style.transform = `translateX(${-pos * 500 + offset * 500 + x%500}px)`;
+          children[pos].style.transform = `translateX(${-pos * 500 + offset * 500 + x % 500}px)`;
         }
-    
+
       };
 
       const up = (event) => {
@@ -54,15 +54,43 @@ class Carousel extends Component {
         position = position - Math.round(x / 500);//鼠标右移👉position为减1，鼠标左移👈position加1
 
 
-        // 露出右图只要选中current和current+1，露出左图只要选中current-1和current做transform
+        // 露出右图只要选中current和current+1做transform，露出左图只要选中current-1和current做transform
         // x<0则鼠标往左,x>0则鼠标往右
-        // +1即露出右图：鼠标往左不满250 or 鼠标往右超过250，形式化表达就是 (x>0 && x-250>0) || (x<0 && x+250>0)
-        // -1即露出左图：鼠标往右不满250 or 鼠标往左超过250，形式化表达就是 (x>0 && x-250<0) || (x<0 && x+250<0)
-        // 结论是：Math.sign(x-250*Math.sign(x))
-        
-        for (const offset of [0,Math.sign(x-250*Math.sign(x))]) {
+        // +1即稍露出右图（松手current往右移，右图消失）：鼠标往左时x%500绝对值处于[0,250] or 鼠标往右时x%500绝对值处于[250,500]
+        // -1即稍露出左图（松手current往左移，左图消失）：鼠标往右时x%500绝对值处于[0,250] or 鼠标往左时x%500绝对值处于[250,500]
+        // 推翻结论：Math.sign(x-250*Math.sign(x))
+
+        let sign 
+        if (x <= 0 &&
+          0 <=Math.abs(x % 500) &&
+          Math.abs(x % 500) < 250
+        ) {
+          sign = +1
+        }
+        if (x > 0 &&
+          250 < x % 500 &&
+          x % 500 < 500
+        ) {
+          sign = +1
+        }
+
+        if (x > 0 &&
+          0 < x % 500 &&
+          x % 500 < 250
+        ) {
+          sign = -1
+        }
+
+        if (x < 0 &&
+          250 <Math.abs(x % 500) &&
+          Math.abs(x % 500) < 500
+        ) {
+          sign = -1
+        }
+
+        for (const offset of [0, sign]) {
           let pos = position + offset
-          pos = (pos%children.length + children.length)%children.length
+          pos = (pos % children.length + children.length) % children.length
           children[pos].style.transition = '';
           children[pos].style.transform = `translateX(${-pos * 500 + offset * 500}px)`;
         }
