@@ -28,18 +28,11 @@ class Carousel extends Component {
       const move = (event) => {
         console.log('move');
         let x = event.clientX - startX;
-
-        // ((x- x%500) / 500) = 0或1或2...往右移position是减1,2...
-        // 实时得出当前的position偏置，用于判断选中哪个照片做transform
-        const RTPosition = position - ((x- x%500) / 500);
-
-        for (const offset of [-1,0,1]) {
-          let pos = RTPosition + offset
-          pos = (pos%children.length + children.length)%children.length//用position偏置算出照片索引
-          children[pos].style.transition = 'none';
-          children[pos].style.transform = `translateX(${-pos * 500 + offset * 500 + x%500}px)`;
+        for (const child of children) {
+          child.style.transition = 'none';
+          // (-position * 500)是起始偏置/基准偏置，只在up时更新一次
+          child.style.transform = `translateX(${-position * 500 + x}px)`;
         }
-    
       };
 
       const up = (event) => {
@@ -50,21 +43,12 @@ class Carousel extends Component {
         // 所以 length + position 重构为 length + position%length
         // 再考虑position从0开始left左移，一直左移，position从0更新到1到2到3到0，可以表示为position%length = (length + position)%length
         // 把左移和右移情况的公式合并成一个公式，则 length + position%length 重构为 (length + position%length)%length
-        // 结论是：position偏置决定了current展示照片的索引，current照片索引可以用公式 (length + position%length)%length 表示
+        // 结论是：position偏置决定了current照片索引，current照片索引可以用公式 (length + position%length)%length 表示
         position = position - Math.round(x / 500);//鼠标右移👉position为减1，鼠标左移👈position加1
 
-
-        // 露出右图只要选中current和current+1，露出左图只要选中current-1和current做transform
-        // x<0则鼠标往左,x>0则鼠标往右
-        // +1即露出右图：鼠标往左不满250 or 鼠标往右超过250，形式化表达就是 (x>0 && x-250>0) || (x<0 && x+250>0)
-        // -1即露出左图：鼠标往右不满250 or 鼠标往左超过250，形式化表达就是 (x>0 && x-250<0) || (x<0 && x+250<0)
-        // 结论是：Math.sign(x-250*Math.sign(x))
-        
-        for (const offset of [0,Math.sign(x-250*Math.sign(x))]) {
-          let pos = position + offset
-          pos = (pos%children.length + children.length)%children.length
-          children[pos].style.transition = '';
-          children[pos].style.transform = `translateX(${-pos * 500 + offset * 500}px)`;
+        for (const child of children) {
+          child.style.transition = '';
+          child.style.transform = `translateX(${-position * 500}px)`;//1个偏置等于500px
         }
         document.removeEventListener('mousemove', move);
         document.removeEventListener('mouseup', up);
