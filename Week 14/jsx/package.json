@@ -1,0 +1,18 @@
+{
+  "name": "jsx",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "webpack",
+    "dev": "npx webpack-dev-server --open"
+  },
+  "devDependencies": {
+    "@babel/core": "7.11.0",
+    "@babel/plugin-transform-react-jsx": "7.10.4",
+    "@babel/preset-env": "^7.12.11",
+    "babel-loader": "8.1.0",
+    "webpack": "4.44.1",
+    "webpack-dev-server": "3.11.0"
+  }
+}
