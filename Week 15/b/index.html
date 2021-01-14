@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+  'use strict'
+const a = {
+    a:function(){
+      console.log(this)
+    }
+}
+a.a()
+const b = a.a.bind([])
+b()
+
+      b.call({l:1})
+  //     b(),
+</script>
+</body>
+</html>
