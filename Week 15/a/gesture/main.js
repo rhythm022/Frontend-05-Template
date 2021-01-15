@@ -34,8 +34,8 @@ element.addEventListener('mousedown', (event) => {
     contexts.delete('mouse' + (1 << event.button))
 
     if (event.buttons === 0) {
-      element.removeEventListener('mousemove', mousemove)
-      element.removeEventListener('mouseup', mouseup)
+      document.removeEventListener('mousemove', mousemove)
+      document.removeEventListener('mouseup', mouseup)
       isListeningMoveUp = false
     }
 
@@ -44,8 +44,8 @@ element.addEventListener('mousedown', (event) => {
   }
 
   if (!isListeningMoveUp) {
-    element.addEventListener('mousemove', mousemove)//因为没必要注册两个move行为函数
-    element.addEventListener('mouseup', mouseup)
+    document.addEventListener('mousemove', mousemove)//因为没必要注册两个move行为函数
+    document.addEventListener('mouseup', mouseup)
 
     isListeningMoveUp = true
   }
@@ -94,6 +94,11 @@ let start = (point, context) => {
   context.isTap = true
   context.isPan = false
   context.isPress = false
+  context.points = [{
+    t:Date.now(),
+    x:point.clientX,
+    y:point.clientY,
+  }]
 
   context.startX = point.clientX, context.startY = point.clientY
 
@@ -119,6 +124,12 @@ let move = (point, context) => {
   if (context.isPan) {
     console.log('pan')
   }
+  context.points = context.points.filter(point=> Date.now() - point.t < 500 )
+  context.points.push({
+    t:Date.now(),
+    x:point.clientX,
+    y:point.clientY,
+  })
 
 }
 
@@ -126,6 +137,7 @@ let move = (point, context) => {
 let end = (point, context) => {
   if (context.isTap) {
     console.log('tap')
+    dispatch('tap',{})
     clearTimeout(context.handler)
   }
   if (context.isPan) {
@@ -134,12 +146,42 @@ let end = (point, context) => {
   if (context.isPress) {
     console.log('pressend')
   }
+
+  context.points = context.points.filter(point=> Date.now() - point.t < 500 )
+
+  let v
+  if(context.points.length === 0){
+    v = 0
+  }else{
+    let d = Math.sqrt((point.clientX - context.points[0].x) ** 2 +
+    (point.clientY - context.points[0].y) ** 2)
+
+    v = d / (Date.now() - context.points[0].t)
+  }
+
+  if(v>1.5){
+    console.log('flick')
+
+    context.isFlick = true
+  }else{
+    context.isFlick = false
+
+  }
 }
 
 
 let cancel = (point, context) => {
   clearTimeout(context.handler)
 
+}
+
+function dispatch(type,property){
+  let event = new Event(type)
+  for (const propertyKey in property) {
+    event[propertyKey] = property[propertyKey]
+  }
+
+  element.dispatchEvent(event)
 }
 
 
