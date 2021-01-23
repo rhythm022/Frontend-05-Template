@@ -125,6 +125,7 @@ export class Recognizer {
   }
 
   start(point, context) {
+
     context.isTap = true
     context.isPan = false
     context.isPress = false
@@ -133,6 +134,10 @@ export class Recognizer {
       x: point.clientX,
       y: point.clientY,
     }]
+    this.dispatcher.dispatch('start', {
+      clientX: point.clientX,
+      clientY: point.clientY,
+    });
 
     context.startX = point.clientX, context.startY = point.clientY
 
@@ -250,32 +255,32 @@ export function enableGesture(element) {
 
 
 
-enableGesture(document.documentElement)
-document.documentElement.addEventListener('tap', (event) => {
-  console.log('tap')
-})
-
-document.documentElement.addEventListener('panstart', (event) => {
-  console.log('panstart')
-})
-document.documentElement.addEventListener('pan', (event) => {
-  console.log('pan')
-})
-document.documentElement.addEventListener('panend', (event) => {
-  console.log('panend')
-})
-document.documentElement.addEventListener('press', (event) => {
-  console.log('press')
-})
-
-document.documentElement.addEventListener('pressend', (event) => {
-  console.log('pressend')
-})
-document.documentElement.addEventListener('flick', (event) => {
-  console.log('flick')
-})
-
-
+// enableGesture(document.documentElement)
+// document.documentElement.addEventListener('tap', (event) => {
+//   console.log('tap')
+// })
+//
+// document.documentElement.addEventListener('panstart', (event) => {
+//   console.log('panstart')
+// })
+// document.documentElement.addEventListener('pan', (event) => {
+//   console.log('pan')
+// })
+// document.documentElement.addEventListener('panend', (event) => {
+//   console.log('panend')
+// })
+// document.documentElement.addEventListener('press', (event) => {
+//   console.log('press')
+// })
+//
+// document.documentElement.addEventListener('pressend', (event) => {
+//   console.log('pressend')
+// })
+// document.documentElement.addEventListener('flick', (event) => {
+//   console.log('flick')
+// })
+//
+//
 
 
 

@@ -67,10 +67,10 @@ export class Timeline {
   reset() {
     this.pause()
     this.state = 'inited'
-
     this[PAUSE_TIME] = 0
     this[ANIMATIONS] = new Set();
     this[START_TIME] = new Map();
+    this[PAUSE_START_TIME] = 0//??
     this[TICK_HANDLER] = null
   }
 
@@ -102,9 +102,49 @@ export class Animation {
   }
 
   receive(time) {// time:已历时间
-    console.log(time);
+    // console.log(time);
     let range = this.endValue - this.startValue;
     let progress = this.timingFunction(time / this.duration)
     this.object[this.prop] = this.template(this.startValue + range * progress);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
