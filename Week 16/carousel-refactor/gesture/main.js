@@ -49,9 +49,10 @@ export class Listener {
 
       }
       const mouseup = (event) => {
-        // console.log('mouseup')
 
         let context = contexts.get('mouse' + (1 << event.button))
+        console.log('mouseup',event.button,(1 << event.button),context)
+
         recognizer.end(event, context)
         contexts.delete('mouse' + (1 << event.button))
 
@@ -100,10 +101,11 @@ export class Listener {
     })
 
     element.addEventListener('touchend', ({ changedTouches }) => {
-      // console.log('touchend')
 
       for (const touch of changedTouches) {
         const context = contexts.get(touch.identifier)
+      console.log('touchend',touch.identifier,context)
+
         recognizer.end(touch, context)
         contexts.delete(touch.identifier)
       }
@@ -237,6 +239,17 @@ export class Recognizer {
         flick: context.isFlick
       });
     }
+
+    this.dispatcher.dispatch('end', {
+      startX: context.startX,
+      startY: context.startY,
+      clientX: point.clientX,
+      clientY: point.clientY,
+      isVertical: context.isVertical,
+      flick: context.isFlick,
+      velocity: v
+
+    });
   }
 
 
