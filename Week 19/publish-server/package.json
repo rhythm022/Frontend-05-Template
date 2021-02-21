@@ -4,11 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start":"node ./server.js",
-    "publish":"scp -r -P 8022 ./* rhythm022@127.0.0.1:/home/rhythm022/publish-server",
+    "start": "node ./server.js",
+    "publish": "scp -r -P 8022 ./* rhythm022@127.0.0.1:/home/rhythm022/publish-server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "unzipper": "^0.10.11"
+  }
 }
